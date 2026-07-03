@@ -1,0 +1,11 @@
+node_modules
+.next
+.env*
+.DS_Store
+.design-source.html
+.design-files.json
+tmp/
+*.tsbuildinfo
+
+# Large reference videos (not used in production build)
+public/animations/*.mp4

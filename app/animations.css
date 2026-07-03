@@ -1,0 +1,615 @@
+/* ── Shared motion tokens ── */
+@keyframes bcAnimFloat {
+  0%,
+  100% {
+    transform: translateY(0) translateX(0);
+  }
+  50% {
+    transform: translateY(-18px) translateX(4px);
+  }
+}
+
+@keyframes bcAnimFloatSlow {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-12px) rotate(3deg);
+  }
+}
+
+@keyframes bcAnimFloatTilt {
+  0%,
+  100% {
+    transform: translateY(0) rotateX(12deg) rotateY(-18deg) rotateZ(-8deg);
+  }
+  50% {
+    transform: translateY(-16px) rotateX(8deg) rotateY(-22deg) rotateZ(-4deg);
+  }
+}
+
+@keyframes bcAnimDrift {
+  0%,
+  100% {
+    transform: translateY(0) translateX(0) rotate(var(--bc-rot, 0deg));
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateY(-22px) translateX(8px) rotate(calc(var(--bc-rot, 0deg) + 12deg));
+    opacity: 0.85;
+  }
+}
+
+@keyframes bcAuraShift {
+  0%,
+  100% {
+    transform: translateX(0) translateY(0) scale(1);
+    opacity: 0.45;
+  }
+  50% {
+    transform: translateX(8px) translateY(-6px) scale(1.06);
+    opacity: 0.75;
+  }
+}
+
+@keyframes bcBlobDrift {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(30px, -20px) scale(1.08);
+  }
+  66% {
+    transform: translate(-20px, 15px) scale(0.95);
+  }
+}
+
+@keyframes bcOrbitPulse {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.bc-anim-float {
+  animation: bcAnimFloat var(--bc-duration, 6s) ease-in-out infinite;
+  animation-delay: var(--bc-delay, 0s);
+}
+
+.bc-anim-float-slow {
+  animation: bcAnimFloatSlow 10s ease-in-out infinite;
+  animation-delay: var(--bc-delay, 0s);
+}
+
+.bc-anim-float-tilt {
+  animation: bcAnimFloatTilt 7s ease-in-out infinite;
+  animation-delay: var(--bc-delay, 0s);
+  transform-style: preserve-3d;
+}
+
+.bc-anim-drift {
+  animation: bcAnimDrift 5.5s ease-in-out infinite;
+  animation-delay: var(--bc-delay, 0s);
+}
+
+/* ── Hero 3D coin cluster ── */
+.bc-hero-scene {
+  position: relative;
+  width: 100%;
+  min-height: 480px;
+  perspective: 900px;
+  transform-style: preserve-3d;
+}
+
+.bc-hero-scene__glow {
+  position: absolute;
+  inset: 10% 0 10% 20%;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.18) 0%, rgba(212, 175, 55, 0) 68%);
+  pointer-events: none;
+  animation: bcGlow 5s ease-in-out infinite;
+}
+
+.bc-hero-scene__hex {
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  top: 50%;
+  left: 50%;
+  margin: -160px 0 0 -120px;
+  opacity: 0.7;
+}
+
+.bc-hero-scene__stack {
+  position: absolute;
+  top: 18%;
+  left: 38%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: rotateX(58deg) rotateZ(-12deg);
+  transform-style: preserve-3d;
+}
+
+.bc-hero-scene__stack--sm {
+  top: 42%;
+  left: 62%;
+  transform: rotateX(58deg) rotateZ(8deg) scale(0.85);
+  opacity: 0.85;
+}
+
+.bc-coin-disc {
+  position: relative;
+  transform-style: preserve-3d;
+}
+
+.bc-coin-disc__face {
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 28%, #f4e4a6 0%, #d4af37 38%, #8b6914 72%, #2a2008 100%);
+  box-shadow:
+    inset 0 3px 10px rgba(255, 248, 220, 0.45),
+    inset 0 -4px 12px rgba(0, 0, 0, 0.55),
+    0 16px 40px rgba(0, 0, 0, 0.55);
+  position: relative;
+  z-index: 2;
+}
+
+.bc-coin-disc__edge {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  background: linear-gradient(180deg, #c9a227 0%, #5c4a14 50%, #2a2008 100%);
+  z-index: 1;
+}
+
+.bc-hero-scene__slab {
+  position: absolute;
+  border-radius: 18px;
+  background: linear-gradient(145deg, #1a1508 0%, #0a0a0a 55%, #141008 100%);
+  border: 1px solid rgba(212, 175, 55, 0.28);
+  box-shadow:
+    0 24px 48px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(212, 175, 55, 0.15);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transform-style: preserve-3d;
+}
+
+.bc-hero-scene__slab--dollar {
+  width: 100px;
+  height: 130px;
+  top: 28%;
+  left: 8%;
+  font-size: 52px;
+  font-weight: 700;
+  color: rgba(212, 175, 55, 0.75);
+}
+
+.bc-hero-scene__slab--brand {
+  width: 110px;
+  height: 150px;
+  bottom: 12%;
+  right: 6%;
+  gap: 6px;
+}
+
+.bc-hero-scene__brand-mark {
+  font-size: 28px;
+  color: #d4af37;
+}
+
+.bc-hero-scene__brand-text {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: rgba(245, 245, 245, 0.85);
+}
+
+.bc-hero-scene__shield {
+  position: absolute;
+  width: 72px;
+  top: 8%;
+  right: 18%;
+}
+
+.bc-hero-scene__shield svg {
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 12px 28px rgba(0, 0, 0, 0.5));
+}
+
+.bc-hero-scene__shard {
+  position: absolute;
+  border-radius: 4px;
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.35), rgba(42, 32, 8, 0.8));
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  opacity: 0.6;
+}
+
+.bc-coin-loose {
+  position: absolute;
+  transform: rotateX(62deg) rotateZ(-20deg);
+}
+
+/* ── Trust / transparency coins ── */
+.bc-trust-scene {
+  position: relative;
+  width: 100%;
+  min-height: 380px;
+  perspective: 800px;
+}
+
+.bc-trust-scene__floor {
+  position: absolute;
+  bottom: 8%;
+  left: 10%;
+  right: 10%;
+  height: 80px;
+  background: radial-gradient(ellipse, rgba(212, 175, 55, 0.12) 0%, transparent 70%);
+  transform: rotateX(72deg);
+  filter: blur(8px);
+}
+
+.bc-trust-coin {
+  position: absolute;
+  transform-style: preserve-3d;
+}
+
+.bc-trust-coin--btc {
+  bottom: 18%;
+  left: 22%;
+  transform: rotateX(8deg) rotateY(-12deg);
+}
+
+.bc-trust-coin--eth {
+  bottom: 22%;
+  left: 48%;
+  transform: rotateX(6deg) rotateY(10deg);
+  z-index: 2;
+}
+
+.bc-trust-coin--blur {
+  opacity: 0.45;
+  filter: blur(1.5px);
+}
+
+.bc-trust-coin__rim {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 3px solid #8b6914;
+  box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.25);
+}
+
+.bc-trust-coin__face {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 25%, #fff8dc 0%, #e8c547 25%, #d4af37 50%, #6b5210 78%, #1a1508 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 42%;
+  font-weight: 700;
+  color: rgba(20, 16, 8, 0.85);
+  box-shadow:
+    inset 0 4px 14px rgba(255, 248, 220, 0.5),
+    0 20px 50px rgba(0, 0, 0, 0.6);
+}
+
+.bc-trust-coin--btc .bc-trust-coin__face {
+  font-size: 48%;
+}
+
+.bc-trust-coin__shine {
+  position: absolute;
+  top: 12%;
+  left: 18%;
+  width: 28%;
+  height: 18%;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.35);
+  filter: blur(4px);
+  animation: bcOrbitPulse 4s ease-in-out infinite;
+}
+
+/* ── Blockchain isometric ── */
+.bc-blockchain-scene {
+  position: relative;
+  width: 100%;
+  min-height: 340px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 700px;
+}
+
+.bc-blockchain-scene__orbit {
+  position: absolute;
+  width: 90%;
+  max-width: 420px;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.bc-blockchain-scene__platform {
+  position: relative;
+  width: 220px;
+  height: 200px;
+  transform: rotateX(58deg) rotateZ(-45deg);
+  transform-style: preserve-3d;
+}
+
+.bc-blockchain-scene__base {
+  position: absolute;
+  background: linear-gradient(135deg, #1a1508, #0a0a0a);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.bc-blockchain-scene__base--1 {
+  width: 200px;
+  height: 120px;
+  bottom: 0;
+  left: 10px;
+}
+
+.bc-blockchain-scene__base--2 {
+  width: 160px;
+  height: 90px;
+  bottom: 28px;
+  left: 30px;
+  opacity: 0.85;
+}
+
+.bc-blockchain-scene__base--3 {
+  width: 120px;
+  height: 60px;
+  bottom: 52px;
+  left: 50px;
+  opacity: 0.7;
+}
+
+.bc-blockchain-scene__core {
+  position: absolute;
+  bottom: 72px;
+  left: 50px;
+  width: 120px;
+  height: 120px;
+  background: rgba(212, 175, 55, 0.06);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  box-shadow:
+    0 0 40px rgba(212, 175, 55, 0.12),
+    inset 0 0 30px rgba(212, 175, 55, 0.08);
+  animation: bcOrbitPulse 4s ease-in-out infinite;
+}
+
+.bc-blockchain-scene__core-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 8px;
+  height: 100%;
+}
+
+.bc-blockchain-scene__core-cell {
+  background: rgba(212, 175, 55, 0.12);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  border-radius: 4px;
+}
+
+.bc-iso-cube {
+  position: relative;
+  transform-style: preserve-3d;
+  transform: rotateX(-30deg) rotateY(45deg);
+}
+
+.bc-iso-cube--node {
+  opacity: 0.85;
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4));
+}
+
+.bc-iso-cube__top,
+.bc-iso-cube__left,
+.bc-iso-cube__right {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.bc-iso-cube__top {
+  background: rgba(212, 175, 55, 0.35);
+  border: 1px solid rgba(232, 197, 71, 0.5);
+  transform: rotateX(90deg) translateZ(calc(var(--cube-half, 14px)));
+  box-shadow: inset 0 0 12px rgba(212, 175, 55, 0.3);
+}
+
+.bc-iso-cube__left {
+  background: rgba(166, 124, 0, 0.45);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  transform: rotateY(-90deg) translateZ(calc(var(--cube-half, 14px)));
+}
+
+.bc-iso-cube__right {
+  background: rgba(42, 32, 8, 0.9);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  transform: translateZ(calc(var(--cube-half, 14px)));
+}
+
+/* ── Pillar card auras ── */
+.bc-pillar-aura {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.bc-pillar-aura--planes .bc-pillar-aura__plane {
+  position: absolute;
+  border-radius: 12px;
+  border: 1px solid rgba(212, 175, 55, 0.15);
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.08), transparent);
+  animation: bcAuraShift 7s ease-in-out infinite;
+}
+
+.bc-pillar-aura__plane--1 {
+  width: 70%;
+  height: 45%;
+  top: -10%;
+  right: -20%;
+  transform: rotate(-18deg);
+  animation-delay: 0s;
+}
+
+.bc-pillar-aura__plane--2 {
+  width: 55%;
+  height: 35%;
+  bottom: 20%;
+  left: -15%;
+  transform: rotate(12deg);
+  animation-delay: 1.2s;
+}
+
+.bc-pillar-aura__plane--3 {
+  width: 40%;
+  height: 28%;
+  top: 35%;
+  right: 10%;
+  transform: rotate(-8deg);
+  animation-delay: 2.4s;
+}
+
+.bc-pillar-aura--horizon .bc-pillar-aura__arc {
+  position: absolute;
+  width: 140%;
+  height: 140%;
+  top: 30%;
+  left: -20%;
+  border-radius: 50%;
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  background: radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.12) 0%, transparent 55%);
+  animation: bcSpinSlow 40s linear infinite;
+}
+
+.bc-pillar-aura--horizon .bc-pillar-aura__dots {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(212, 175, 55, 0.35) 1px, transparent 1px);
+  background-size: 18px 18px;
+  opacity: 0.25;
+  animation: bcAuraShift 8s ease-in-out infinite;
+}
+
+.bc-pillar-aura--mesh .bc-pillar-aura__facet {
+  position: absolute;
+  background: linear-gradient(160deg, rgba(212, 175, 55, 0.1), transparent);
+  border: 1px solid rgba(212, 175, 55, 0.1);
+  animation: bcAuraShift 6s ease-in-out infinite;
+}
+
+.bc-pillar-aura__facet--1 {
+  width: 60%;
+  height: 50%;
+  top: -5%;
+  left: -10%;
+  transform: skewY(-8deg);
+}
+
+.bc-pillar-aura__facet--2 {
+  width: 50%;
+  height: 40%;
+  bottom: 10%;
+  right: -5%;
+  transform: skewY(6deg);
+  animation-delay: 1s;
+}
+
+.bc-pillar-aura__facet--3 {
+  width: 35%;
+  height: 30%;
+  top: 40%;
+  left: 30%;
+  animation-delay: 2s;
+}
+
+/* ── Footer fluid blobs ── */
+.bc-fluid-blobs {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.bc-fluid-blobs__blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  animation: bcBlobDrift 18s ease-in-out infinite;
+}
+
+.bc-fluid-blobs__blob--1 {
+  width: 420px;
+  height: 320px;
+  top: -10%;
+  left: -8%;
+  background: rgba(212, 175, 55, 0.08);
+}
+
+.bc-fluid-blobs__blob--2 {
+  width: 360px;
+  height: 280px;
+  bottom: -5%;
+  right: -5%;
+  background: rgba(166, 124, 0, 0.1);
+  animation-delay: -6s;
+}
+
+.bc-fluid-blobs__blob--3 {
+  width: 280px;
+  height: 240px;
+  top: 40%;
+  left: 45%;
+  background: rgba(212, 175, 55, 0.06);
+  animation-delay: -12s;
+}
+
+@media (max-width: 1100px) {
+  .bc-hero-scene {
+    min-height: 360px;
+    margin-top: 20px;
+  }
+
+  .bc-hero-scene__hex {
+    width: 260px;
+    height: 260px;
+    margin-left: -130px;
+  }
+
+  .bc-trust-scene {
+    min-height: 300px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bc-anim-float,
+  .bc-anim-float-slow,
+  .bc-anim-float-tilt,
+  .bc-anim-drift,
+  .bc-pillar-aura__plane,
+  .bc-pillar-aura__arc,
+  .bc-pillar-aura__dots,
+  .bc-pillar-aura__facet,
+  .bc-fluid-blobs__blob,
+  .bc-trust-coin__shine,
+  .bc-blockchain-scene__core {
+    animation: none !important;
+  }
+}
