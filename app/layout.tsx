@@ -37,6 +37,10 @@ export const metadata: Metadata = {
     description:
       "Tiered USDT dividends, automatic compounding, transparent rewards, and VIP benefits on Ethereum.",
   },
+  icons: {
+    icon: [{ url: "/icon", type: "image/png" }],
+    apple: [{ url: "/apple-icon", type: "image/png" }],
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

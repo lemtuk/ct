@@ -39,33 +39,63 @@ type ConnectWalletModalProps = {
   onClose: () => void;
 };
 
+const CLOSE_MS = 340;
+
 export default function ConnectWalletModal({ open, onClose }: ConnectWalletModalProps) {
   const [network, setNetwork] = useState<Network>("ETH");
+  const [visible, setVisible] = useState(false);
+  const [closing, setClosing] = useState(false);
 
   useEffect(() => {
-    if (!open) return;
+    if (open) {
+      setVisible(true);
+      setClosing(false);
+      return;
+    }
+
+    if (!visible) return;
+
+    setClosing(true);
+    const timer = window.setTimeout(() => {
+      setVisible(false);
+      setClosing(false);
+    }, CLOSE_MS);
+
+    return () => window.clearTimeout(timer);
+  }, [open, visible]);
+
+  useEffect(() => {
+    if (!visible) return;
+
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
     };
+
     document.body.style.overflow = "hidden";
     window.addEventListener("keydown", onKey);
     return () => {
       document.body.style.overflow = "";
       window.removeEventListener("keydown", onKey);
     };
-  }, [open, onClose]);
+  }, [visible, onClose]);
 
-  if (!open) return null;
+  if (!visible) return null;
 
   return (
-    <div className="wallet-modal-backdrop" onClick={onClose} role="presentation">
+    <div
+      className={`wallet-modal-backdrop ${closing ? "wallet-modal-backdrop--closing" : "wallet-modal-backdrop--open"}`}
+      onClick={onClose}
+      role="presentation"
+    >
       <div
-        className="wallet-modal"
+        className={`wallet-modal ${closing ? "wallet-modal--closing" : "wallet-modal--open"}`}
         onClick={(event) => event.stopPropagation()}
         role="dialog"
         aria-modal="true"
         aria-labelledby="wallet-modal-title"
       >
+        <div className="wallet-modal-grabber" aria-hidden="true" />
+
         <div className="wallet-modal-header">
           <h2 id="wallet-modal-title" className="wallet-modal-title">
             Connect Wallet
