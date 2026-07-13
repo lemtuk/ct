@@ -1,41 +1,55 @@
 import type { Metadata } from "next";
-import { Archivo } from "next/font/google";
+import { Space_Grotesk, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
-import "./animations.css";
 
-const archivo = Archivo({
+const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
-  variable: "--font-archivo",
+  variable: "--font-sg",
   display: "swap",
-  weight: ["400", "500", "600", "700"],
+  weight: ["500", "600", "700"],
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://bestcrypto.app";
+const ibmPlexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  display: "swap",
+  weight: ["400", "500", "600"],
+});
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://bestbuy.finance";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: "BestCrypto — Compound Your USDT On-Chain",
+  title: "BestBuy — Compound Your USDT On-Chain",
   description:
-    "Tiered daily dividends up to 2% with automatic compounding. Fully decentralized. Transparent rewards. Premium VIP benefits on Ethereum.",
-  keywords: ["BestCrypto", "USDT", "staking", "DeFi", "Ethereum", "compound", "non-custodial"],
+    "BestBuy helps USDT holders access tiered daily dividends up to 2% with automatic compounding, transparent on-chain rewards, and premium VIP benefits.",
+  keywords: ["BestBuy", "USDT", "staking", "yield", "DeFi", "Ethereum", "on-chain", "stablecoin"],
   openGraph: {
     type: "website",
-    title: "BestCrypto — Compound Your USDT On-Chain",
+    title: "BestBuy — Compound Your USDT On-Chain",
     description:
-      "Tiered daily dividends up to 2% with automatic compounding. Fully decentralized. Transparent rewards.",
-    siteName: "BestCrypto",
+      "Tiered USDT dividends, automatic compounding, transparent rewards, and VIP benefits on Ethereum.",
+    siteName: "BestBuy",
   },
   twitter: {
     card: "summary_large_image",
-    title: "BestCrypto — Compound Your USDT On-Chain",
+    title: "BestBuy — Compound Your USDT On-Chain",
     description:
-      "Tiered daily dividends up to 2% with automatic compounding. Fully decentralized. Transparent rewards.",
+      "Tiered USDT dividends, automatic compounding, transparent rewards, and VIP benefits on Ethereum.",
   },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={archivo.variable}>
+    <html lang="en" className={`${spaceGrotesk.variable} ${ibmPlexMono.variable}`}>
+      <head>
+        <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+          crossOrigin="anonymous"
+          referrerPolicy="no-referrer"
+        />
+      </head>
       <body>{children}</body>
     </html>
   );

@@ -40,7 +40,9 @@ git push -u origin main
 ```
 app/                    # pages, layout, global styles
 components/             # Nav, FadeIn, animation scenes
-components/animations/  # HeroCoinScene, FloatingCoins, etc.
+components/three/       # CryptoCoin3D, HeroScene3D, TrustScene3D, ProtocolScene3D
+components/animations/  # PillarAura, FluidBlobs, etc.
+public/coins/           # 3D coin renders (BTC, ETH, SOL, BNB)
 lib/data.ts             # tiers, pillars, copy data
 public/animations/      # optional local media assets
 ```
