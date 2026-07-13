@@ -6,6 +6,7 @@ import { Environment, Float, Stars } from "@react-three/drei";
 import type { Group } from "three";
 import GoldCoin from "./GoldCoin";
 import CryptoCoin3D from "./CryptoCoin3D";
+import { CoinShadow, GlassPanel, OrbitRings, PerspectiveGrid } from "./SceneDecor";
 import { coins } from "@/lib/assets";
 
 function SceneContent() {
@@ -20,8 +21,19 @@ function SceneContent() {
 
   return (
     <group ref={group}>
+      <PerspectiveGrid />
+      <OrbitRings />
+
+      <GlassPanel position={[-2.1, 0.15, -1.1]} rotation={[0, 0.42, 0.04]} size={[2.1, 3]} opacity={0.055} />
+      <GlassPanel position={[2.25, -0.05, -0.9]} rotation={[0, -0.38, -0.03]} size={[1.9, 2.8]} opacity={0.05} />
+      <GlassPanel position={[0.2, 0.85, -1.6]} rotation={[0.08, 0.1, 0]} size={[3.2, 1.4]} opacity={0.04} />
+
+      <CoinShadow position={[0.15, 0, 0.9]} scale={1.5} />
+      <CoinShadow position={[-1.85, 0, -0.5]} scale={0.78} />
+      <CoinShadow position={[1.8, 0, -0.3]} scale={0.66} />
+      <CoinShadow position={[-1.2, 0, 0.3]} scale={0.52} />
+
       <Suspense fallback={null}>
-        {/* Centerpiece — Bitcoin */}
         <CryptoCoin3D
           coin={coins.btc}
           position={[0.15, 0.05, 0.9]}
@@ -30,7 +42,6 @@ function SceneContent() {
           floatIntensity={0.7}
           tilt={[0.12, 0, 0.05]}
         />
-        {/* Ethereum — upper left */}
         <CryptoCoin3D
           coin={coins.ethBlue}
           position={[-1.85, 0.75, -0.5]}
@@ -39,7 +50,6 @@ function SceneContent() {
           floatIntensity={0.5}
           tilt={[0.08, 0, -0.1]}
         />
-        {/* Solana — right */}
         <CryptoCoin3D
           coin={coins.sol}
           position={[1.8, -0.55, -0.3]}
@@ -48,7 +58,6 @@ function SceneContent() {
           floatIntensity={0.45}
           tilt={[0.15, 0, 0.08]}
         />
-        {/* BNB — lower left */}
         <CryptoCoin3D
           coin={coins.bnb}
           position={[-1.2, -0.95, 0.3]}
@@ -57,7 +66,6 @@ function SceneContent() {
           floatIntensity={0.4}
           tilt={[0.1, 0, -0.06]}
         />
-        {/* ETH — small far accent */}
         <CryptoCoin3D
           coin={coins.ethBlue}
           position={[2.15, 0.95, -1.2]}
@@ -70,13 +78,6 @@ function SceneContent() {
 
       <GoldCoin position={[-2.5, -0.2, -1.4]} scale={0.28} rotationSpeed={0.005} />
       <GoldCoin position={[0.9, 1.35, -1.6]} scale={0.22} rotationSpeed={-0.004} />
-
-      <Float speed={1.2} floatIntensity={0.4}>
-        <mesh position={[0, -1.4, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <ringGeometry args={[2.5, 3.2, 64]} />
-          <meshBasicMaterial color="#d4af37" transparent opacity={0.06} />
-        </mesh>
-      </Float>
     </group>
   );
 }
@@ -90,12 +91,14 @@ export default function HeroScene3D() {
         gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}
         style={{ background: "transparent" }}
       >
-        <ambientLight intensity={0.4} />
+        <fog attach="fog" args={["#090E0C", 9, 20]} />
+        <ambientLight intensity={0.38} />
         <spotLight position={[8, 12, 8]} angle={0.35} penumbra={0.8} intensity={2.6} color="#fff8dc" castShadow />
         <pointLight position={[-6, -4, 6]} intensity={1.3} color="#d4af37" />
         <pointLight position={[4, 2, -4]} intensity={0.7} color="#a67c00" />
-        <pointLight position={[-3, 3, 3]} intensity={0.4} color="#b088e8" />
-        <Stars radius={80} depth={40} count={1200} factor={3} saturation={0} fade speed={0.4} />
+        <pointLight position={[-3, 3, 3]} intensity={0.45} color="#b088e8" />
+        <pointLight position={[0, 2, 4]} intensity={0.55} color="#2EE6A8" />
+        <Stars radius={80} depth={40} count={1400} factor={3} saturation={0} fade speed={0.35} />
         <Suspense fallback={null}>
           <SceneContent />
           <Environment preset="night" />

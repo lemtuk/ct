@@ -5,6 +5,7 @@ import BestBuyLogo from "@/components/BestBuyLogo";
 import ConnectWalletModal from "@/components/ConnectWalletModal";
 import FaIcon from "@/components/FaIcon";
 import Reveal from "@/components/Reveal";
+import CryptoTicker from "@/components/CryptoTicker";
 import HeroScene3D from "@/components/three/HeroScene3D";
 
 const STATS = [
@@ -65,6 +66,31 @@ const VIP_ROWS = [
   { level: "VIP 3", requirement: "100,000+ USDT", bonus: "+1.0%", perks: "All features unlocked" },
 ];
 
+const CIRCULATE_POINTS = [
+  {
+    icon: "chart-line",
+    title: "Stop idle losses",
+    body: "Don't leave crypto sitting on an exchange while market swings erode value.",
+  },
+  {
+    icon: "link",
+    title: "Connect, don't withdraw",
+    body: "BestBuy is a portal — your funds stay in your exchange while earning on-chain.",
+  },
+  {
+    icon: "rotate",
+    title: "Compound over time",
+    body: "Like banks circulating deposits, your crypto works harder and compounds profits safely.",
+  },
+];
+
+const SECURITY_BADGES = [
+  { label: "CertiK", href: "#security", icon: "certificate" },
+  { label: "OpenZeppelin", href: "#security", icon: "shield" },
+  { label: "Security Audit", href: "#security", icon: "file-shield" },
+  { label: "Documentation", href: "#footer", icon: "book" },
+];
+
 const SECURITY = [
   { icon: "lock", title: "Audited Smart Contracts", body: "Professionally audited by CertiK. OpenZeppelin security standards." },
   { icon: "bolt", title: "Non-Custodial", body: "You control your funds. Withdraw anytime without permission." },
@@ -74,9 +100,41 @@ const SECURITY = [
 
 const SOCIALS = [
   { label: "X", icon: "x-twitter", brand: true },
-  { label: "T", icon: "telegram", brand: true },
-  { label: "D", icon: "discord", brand: true },
+  { label: "Telegram", icon: "telegram", brand: true },
+  { label: "Discord", icon: "discord", brand: true },
 ] as const;
+
+const FOOTER_COLUMNS = [
+  {
+    title: "Product",
+    links: [
+      { label: "Staking Tiers", href: "#tiers" },
+      { label: "VIP Benefits", href: "#vip" },
+      { label: "Why Circulate", href: "#circulate" },
+      { label: "Connect Wallet", href: "#top" },
+    ],
+  },
+  {
+    title: "Security",
+    links: [
+      { label: "Security Overview", href: "#security" },
+      { label: "CertiK Audit", href: "#security" },
+      { label: "OpenZeppelin", href: "#security" },
+      { label: "Smart Contracts", href: "#security" },
+    ],
+  },
+  {
+    title: "Resources",
+    links: [
+      { label: "Documentation", href: "#footer" },
+      { label: "Terms of Service", href: "#footer" },
+      { label: "Privacy Policy", href: "#footer" },
+      { label: "Support", href: "#footer" },
+    ],
+  },
+];
+
+const FOOTER_NETWORKS = ["Ethereum", "BSC", "Tron", "Arbitrum", "Base", "Solana"];
 
 export default function LandingPage() {
   const [walletOpen, setWalletOpen] = useState(false);
@@ -164,20 +222,44 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="bb-section bb-paragraph-section">
-        <Reveal from="up">
-          <div className="bb-info-card">
-            <div className="bb-eyebrow">Why Circulate Your Crypto</div>
-            <p>
-              Don&apos;t leave your crypto lying on exchange and losing value with market fluctuations.
-              Connect your wallet to BestBuy to grow your crypto gradually over time. No money will be
-              taken out of your exchange; this is a portal that lets your crypto circulate in the blockchain
-              to earn interest while safely still in your exchange, just like banks do when you deposit money.
-              They make much more by circulating the money. Remember, crypto is limited. Circulating your
-              crypto safely compounds profits.
-            </p>
+      <CryptoTicker />
+
+      <section id="circulate" className="bb-section bb-circulate">
+        <div className="bb-circulate-grid">
+          <Reveal from="left">
+            <div className="bb-circulate-copy">
+              <div className="bb-eyebrow">Why Circulate Your Crypto</div>
+              <h2 className="bb-circulate-title">
+                Put your holdings to work — without moving them off exchange
+              </h2>
+              <p className="bb-circulate-lead">
+                Connect your wallet to BestBuy and grow your crypto gradually over time.
+                No money is taken out of your exchange.
+              </p>
+              <p className="bb-circulate-body">
+                This portal lets your crypto circulate on the blockchain to earn interest while
+                it remains safely in your exchange — the same way banks circulate deposits to
+                generate returns. Crypto is limited; circulating yours compounds profits.
+              </p>
+            </div>
+          </Reveal>
+
+          <div className="bb-circulate-points">
+            {CIRCULATE_POINTS.map((point, index) => (
+              <Reveal key={point.title} from="right" delay={index * 90}>
+                <div className="circulate-point">
+                  <div className="circulate-point-icon">
+                    <FaIcon icon={point.icon} />
+                  </div>
+                  <div>
+                    <h3>{point.title}</h3>
+                    <p>{point.body}</p>
+                  </div>
+                </div>
+              </Reveal>
+            ))}
           </div>
-        </Reveal>
+        </div>
       </section>
 
       <section id="tiers" className="bb-section">
@@ -257,11 +339,27 @@ export default function LandingPage() {
 
       <section id="security" className="bb-section bb-security">
         <Reveal from="left">
-          <div className="bb-section-head">
-            <h2>Security First</h2>
+          <div className="bb-security-intro">
+            <h2 className="bb-security-title">
+              Security<br />
+              <span>First</span>
+            </h2>
+            <p className="bb-security-lead">
+              Professionally audited smart contracts built on OpenZeppelin standards.
+              You stay in control of your funds at all times — everything verifiable on-chain.
+            </p>
+            <div className="bb-trust-badges">
+              {SECURITY_BADGES.map((badge) => (
+                <a key={badge.label} href={badge.href} className="bb-trust-badge">
+                  <FaIcon icon={badge.icon} />
+                  {badge.label}
+                </a>
+              ))}
+            </div>
           </div>
         </Reveal>
-        <div className="bb-grid-4 reveal-stagger">
+
+        <div className="bb-grid-4 reveal-stagger bb-security-grid">
           {SECURITY.map((item, index) => (
             <Reveal key={item.title} from={index % 2 === 0 ? "left" : "right"} delay={index * 60}>
               <div className="sec-stat-card">
@@ -277,25 +375,64 @@ export default function LandingPage() {
       </section>
 
       <footer id="footer" className="bb-footer">
-        <Reveal from="up">
-          <div className="bb-footer-links">
-            {["Documentation", "Security Audit", "Terms", "Privacy"].map((link) => (
-              <a key={link} href={link === "Security Audit" ? "#security" : "#footer"} className="footer-link">{link}</a>
-            ))}
-          </div>
-        </Reveal>
-        <Reveal from="up" delay={80}>
-          <div className="bb-socials">
-            {SOCIALS.map((social) => (
-              <a key={social.label} href="#footer" className="social-link social-link--icon" aria-label={social.label}>
-                <FaIcon icon={social.icon} brand={social.brand} />
-              </a>
-            ))}
-          </div>
-        </Reveal>
-        <Reveal from="up" delay={140}>
-          <p>© 2026 Audited by CertiK. Built on Ethereum.</p>
-        </Reveal>
+        <div className="bb-footer-main">
+          <Reveal from="up">
+            <div className="bb-footer-brand">
+              <div className="bb-footer-logo">
+                <BestBuyLogo />
+                <span>BestBuy</span>
+              </div>
+              <p>
+                Tiered on-chain USDT staking with automatic compounding, VIP rewards,
+                and non-custodial wallet access.
+              </p>
+              <div className="bb-footer-networks">
+                <span className="bb-footer-networks-label">Supported networks</span>
+                <div className="bb-footer-network-pills">
+                  {FOOTER_NETWORKS.map((network) => (
+                    <span key={network} className="bb-footer-network-pill">{network}</span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </Reveal>
+
+          {FOOTER_COLUMNS.map((column, index) => (
+            <Reveal key={column.title} from="up" delay={60 + index * 50}>
+              <div className="bb-footer-col">
+                <h4>{column.title}</h4>
+                <ul>
+                  {column.links.map((link) => (
+                    <li key={link.label}>
+                      <a href={link.href} className="footer-link">{link.label}</a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+
+        <div className="bb-footer-bottom">
+          <Reveal from="up" delay={120}>
+            <div className="bb-footer-bottom-left">
+              <p>© 2026 BestBuy. Audited by CertiK. Built on Ethereum.</p>
+              <p className="bb-footer-disclaimer">
+                Crypto assets involve risk. Past performance does not guarantee future returns.
+                Always verify contract addresses before connecting your wallet.
+              </p>
+            </div>
+          </Reveal>
+          <Reveal from="up" delay={160}>
+            <div className="bb-socials">
+              {SOCIALS.map((social) => (
+                <a key={social.label} href="#footer" className="social-link social-link--icon" aria-label={social.label}>
+                  <FaIcon icon={social.icon} brand={social.brand} />
+                </a>
+              ))}
+            </div>
+          </Reveal>
+        </div>
       </footer>
     </div>
   );
