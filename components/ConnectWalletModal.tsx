@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import FaIcon from "@/components/FaIcon";
+import { useWallet } from "@/lib/WalletContext";
+import type { NetworkId } from "@/lib/wallet";
 
-type Network = "BSC" | "ETH" | "TRX" | "BTC";
-
-const NETWORKS: Network[] = ["BSC", "ETH", "TRX", "BTC"];
+const NETWORKS: NetworkId[] = ["BSC", "ETH"];
 
 const WALLETS = [
   {
@@ -42,14 +42,19 @@ type ConnectWalletModalProps = {
 const CLOSE_MS = 340;
 
 export default function ConnectWalletModal({ open, onClose }: ConnectWalletModalProps) {
-  const [network, setNetwork] = useState<Network>("ETH");
+  const [network, setNetwork] = useState<NetworkId>("ETH");
   const [visible, setVisible] = useState(false);
   const [closing, setClosing] = useState(false);
+  const [error, setError] = useState("");
+  const { connect, status } = useWallet();
+
+  const isConnecting = status === "connecting";
 
   useEffect(() => {
     if (open) {
       setVisible(true);
       setClosing(false);
+      setError("");
       return;
     }
 
@@ -78,6 +83,16 @@ export default function ConnectWalletModal({ open, onClose }: ConnectWalletModal
       window.removeEventListener("keydown", onKey);
     };
   }, [visible, onClose]);
+
+  async function handleConnect(walletId: string) {
+    setError("");
+    try {
+      await connect(walletId, network);
+      onClose();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Connection failed");
+    }
+  }
 
   if (!visible) return null;
 
@@ -114,6 +129,7 @@ export default function ConnectWalletModal({ open, onClose }: ConnectWalletModal
                 type="button"
                 className={`wallet-network-pill ${network === item ? "wallet-network-pill--active" : ""}`}
                 onClick={() => setNetwork(item)}
+                disabled={isConnecting}
               >
                 {item}
               </button>
@@ -125,15 +141,30 @@ export default function ConnectWalletModal({ open, onClose }: ConnectWalletModal
           Choose your preferred wallet to connect to <strong>BestBuy</strong>
         </p>
 
+        {error && (
+          <div style={{ color: "#ff6b6b", fontSize: "0.85rem", padding: "0.5rem 1rem", textAlign: "center" }}>
+            {error}
+          </div>
+        )}
+
         <div className="wallet-options">
           {WALLETS.map((wallet) => (
-            <button key={wallet.id} type="button" className="wallet-option">
+            <button
+              key={wallet.id}
+              type="button"
+              className="wallet-option"
+              onClick={() => handleConnect(wallet.id)}
+              disabled={isConnecting}
+              style={isConnecting ? { opacity: 0.6, cursor: "wait" } : undefined}
+            >
               <span className="wallet-option-icon" style={{ background: `${wallet.color}22`, color: wallet.color }}>
                 <FaIcon icon={wallet.icon} />
               </span>
               <span className="wallet-option-copy">
                 <span className="wallet-option-name">{wallet.name}</span>
-                <span className="wallet-option-desc">{wallet.description}</span>
+                <span className="wallet-option-desc">
+                  {isConnecting ? "Connecting..." : wallet.description}
+                </span>
               </span>
               <FaIcon icon="chevron-right" className="wallet-option-arrow" />
             </button>

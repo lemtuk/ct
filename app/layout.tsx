@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, IBM_Plex_Mono } from "next/font/google";
+import { WalletProvider } from "@/lib/WalletContext";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -54,7 +55,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           referrerPolicy="no-referrer"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <WalletProvider>{children}</WalletProvider>
+      </body>
     </html>
   );
 }

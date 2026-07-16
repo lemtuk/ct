@@ -7,6 +7,7 @@ import FaIcon from "@/components/FaIcon";
 import Reveal from "@/components/Reveal";
 import CryptoTicker from "@/components/CryptoTicker";
 import HeroScene3D from "@/components/three/HeroScene3D";
+import { useWallet } from "@/lib/WalletContext";
 
 const STATS = [
   { value: "$12.4M", label: "Total Value Locked" },
@@ -138,8 +139,10 @@ const FOOTER_NETWORKS = ["Ethereum", "BSC", "Tron", "Arbitrum", "Base", "Solana"
 
 export default function LandingPage() {
   const [walletOpen, setWalletOpen] = useState(false);
+  const { address, short, status, disconnect } = useWallet();
   const openWallet = () => setWalletOpen(true);
   const closeWallet = () => setWalletOpen(false);
+  const isConnected = status === "approved" || status === "pending";
 
   return (
     <div style={{ background: "#090E0C", color: "#E9F2ED", minWidth: 0, overflow: "hidden" }}>
@@ -156,7 +159,16 @@ export default function LandingPage() {
               <a key={l} href={l === "Documentation" ? "#footer" : `#${l.toLowerCase()}`} className="nav-link">{l}</a>
             ))}
           </div>
-          <button type="button" className="btn-green" onClick={openWallet}>Connect Wallet</button>
+          {isConnected ? (
+            <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+              <a href="/dashboard" className="btn-green">Dashboard</a>
+              <button type="button" className="btn-ghost" onClick={disconnect} style={{ fontSize: "0.85rem" }}>
+                {short}
+              </button>
+            </div>
+          ) : (
+            <button type="button" className="btn-green" onClick={openWallet}>Connect Wallet</button>
+          )}
         </Reveal>
 
         <div className="bb-hero-grid" id="top">
@@ -182,7 +194,11 @@ export default function LandingPage() {
             </Reveal>
             <Reveal from="left" immediate delay={280}>
               <div className="bb-hero-actions">
-                <button type="button" className="btn-green-lg" onClick={openWallet}>Connect Wallet</button>
+                {isConnected ? (
+                  <a href="/dashboard" className="btn-green-lg">Go to Dashboard</a>
+                ) : (
+                  <button type="button" className="btn-green-lg" onClick={openWallet}>Connect Wallet</button>
+                )}
                 <a href="#tiers" className="btn-ghost">View Staking Tiers</a>
               </div>
             </Reveal>
