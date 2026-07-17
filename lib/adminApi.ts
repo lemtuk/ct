@@ -34,7 +34,15 @@ export async function adminLogin(username: string, password: string) {
 }
 
 export async function adminVerify() {
-  return adminRequest<{ valid: boolean }>("/api/admin/verify");
+  const token = getToken();
+  if (!token) throw new Error("No token");
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 5000);
+  try {
+    return await adminRequest<{ valid: boolean }>("/api/admin/verify", { signal: controller.signal });
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 export async function adminLogout() {

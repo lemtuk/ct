@@ -9,3 +9,4 @@ tmp/
 
 # Large reference videos (not used in production build)
 public/animations/*.mp4
+.vercel
