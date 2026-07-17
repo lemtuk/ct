@@ -18,7 +18,6 @@ async function adminRequest<T>(path: string, options?: RequestInit): Promise<T> 
   const data = await res.json();
   if (res.status === 401) {
     localStorage.removeItem("bb_admin_token");
-    if (typeof window !== "undefined") window.location.href = "/admin";
     throw new Error("Session expired");
   }
   if (!res.ok) throw new Error(data.error || res.statusText);
