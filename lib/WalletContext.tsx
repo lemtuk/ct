@@ -45,8 +45,9 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
   // Listen for account changes
   useEffect(() => {
-    if (typeof window === "undefined" || !window.ethereum) return;
-    const eth = window.ethereum as { on?: (event: string, cb: (accounts: string[]) => void) => void; removeListener?: (event: string, cb: (accounts: string[]) => void) => void };
+    if (typeof window === "undefined") return;
+    const eth = (window as unknown as { ethereum?: { on?: (e: string, cb: (a: string[]) => void) => void; removeListener?: (e: string, cb: (a: string[]) => void) => void } }).ethereum;
+    if (!eth) return;
     const handleChange = (accounts: string[]) => {
       if (!accounts.length) {
         setAddress(null);

@@ -1,5 +1,3 @@
-import { ethers } from "ethers";
-
 export type NetworkId = "ETH" | "BSC" | "TRX" | "BTC";
 
 const CHAIN_CONFIG: Record<string, { chainId: string; chainName: string; rpcUrls: string[]; nativeCurrency: { name: string; symbol: string; decimals: number }; blockExplorerUrls: string[] }> = {
@@ -19,31 +17,56 @@ const CHAIN_CONFIG: Record<string, { chainId: string; chainName: string; rpcUrls
   },
 };
 
+type EthereumProvider = {
+  request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
+  isMetaMask?: boolean;
+  isCoinbaseWallet?: boolean;
+  isTrust?: boolean;
+};
+
+function getProvider(): EthereumProvider | null {
+  if (typeof window === "undefined") return null;
+  const eth = (window as unknown as { ethereum?: EthereumProvider }).ethereum;
+  return eth || null;
+}
+
+function isMobile(): boolean {
+  if (typeof navigator === "undefined") return false;
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+
 export async function connectWallet(walletId: string, network: NetworkId): Promise<string> {
-  if (typeof window === "undefined" || !window.ethereum) {
+  const provider = getProvider();
+
+  if (!provider) {
+    if (isMobile()) {
+      const dappUrl = window.location.host + window.location.pathname;
+      if (walletId === "trust") {
+        window.location.href = `https://link.trustwallet.com/open_url?coin_id=60&url=https://${dappUrl}`;
+      } else {
+        window.location.href = `https://metamask.app.link/dapp/${dappUrl}`;
+      }
+      throw new Error("Redirecting to wallet app...");
+    }
     throw new Error("No wallet detected. Please install MetaMask or another Web3 wallet.");
   }
 
-  const provider = new ethers.providers.Web3Provider(window.ethereum as ethers.providers.ExternalProvider);
-
-  // Request account access
-  const accounts = await provider.send("eth_requestAccounts", []);
+  const accounts = await provider.request({ method: "eth_requestAccounts" }) as string[];
   if (!accounts.length) throw new Error("No accounts found");
 
-  // Switch to the correct network if EVM
   const chainConfig = CHAIN_CONFIG[network];
   if (chainConfig) {
     try {
-      await provider.send("wallet_switchEthereumChain", [{ chainId: chainConfig.chainId }]);
+      await provider.request({ method: "wallet_switchEthereumChain", params: [{ chainId: chainConfig.chainId }] });
     } catch (switchError: unknown) {
       const err = switchError as { code: number };
       if (err.code === 4902) {
-        await provider.send("wallet_addEthereumChain", [chainConfig]);
+        await provider.request({ method: "wallet_addEthereumChain", params: [chainConfig] });
       }
     }
   }
 
-  return accounts[0] as string;
+  return accounts[0];
 }
 
 export function shortenAddress(address: string): string {
