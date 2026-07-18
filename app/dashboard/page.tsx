@@ -66,6 +66,7 @@ export default function DashboardPage() {
   }, [address]);
 
   useEffect(() => {
+    if (walletStatus === "loading") return;
     if (walletStatus === "disconnected") {
       router.push("/");
       return;

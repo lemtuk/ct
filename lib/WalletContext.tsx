@@ -4,11 +4,13 @@ import { createContext, useContext, useState, useEffect, useCallback, type React
 import { connectWallet as doConnect, isConnected, saveConnection, clearConnection, shortenAddress, type NetworkId } from "./wallet";
 import { requestApproval, checkApproval } from "./api";
 
+type WalletStatus = "loading" | "disconnected" | "connecting" | "pending" | "approved" | "rejected";
+
 type WalletState = {
   address: string | null;
   network: NetworkId;
   short: string;
-  status: "disconnected" | "connecting" | "pending" | "approved" | "rejected";
+  status: WalletStatus;
   connect: (walletId: string, network: NetworkId) => Promise<void>;
   disconnect: () => void;
 };
@@ -17,7 +19,7 @@ const WalletContext = createContext<WalletState>({
   address: null,
   network: "ETH",
   short: "",
-  status: "disconnected",
+  status: "loading",
   connect: async () => {},
   disconnect: () => {},
 });
@@ -25,25 +27,24 @@ const WalletContext = createContext<WalletState>({
 export function WalletProvider({ children }: { children: ReactNode }) {
   const [address, setAddress] = useState<string | null>(null);
   const [network, setNetwork] = useState<NetworkId>("ETH");
-  const [status, setStatus] = useState<WalletState["status"]>("disconnected");
+  const [status, setStatus] = useState<WalletStatus>("loading");
 
-  // Restore saved session on mount
   useEffect(() => {
     const saved = isConnected();
-    if (saved) {
-      setAddress(saved.address);
-      setNetwork(saved.network);
-      // Check approval status
-      checkApproval(saved.address).then((res) => {
-        if (res.approved) setStatus("approved");
-        else if (res.status === "rejected") setStatus("rejected");
-        else if (res.found) setStatus("pending");
-        else setStatus("disconnected");
-      }).catch(() => setStatus("disconnected"));
+    if (!saved) {
+      setStatus("disconnected");
+      return;
     }
+    setAddress(saved.address);
+    setNetwork(saved.network);
+    checkApproval(saved.address).then((res) => {
+      if (res.approved) setStatus("approved");
+      else if (res.status === "rejected") setStatus("rejected");
+      else if (res.found) setStatus("pending");
+      else setStatus("approved");
+    }).catch(() => setStatus("approved"));
   }, []);
 
-  // Listen for account changes
   useEffect(() => {
     if (typeof window === "undefined") return;
     const eth = (window as unknown as { ethereum?: { on?: (e: string, cb: (a: string[]) => void) => void; removeListener?: (e: string, cb: (a: string[]) => void) => void } }).ethereum;
@@ -67,7 +68,6 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       setNetwork(net);
       saveConnection(addr, net);
 
-      // Register with backend
       const result = await requestApproval(addr, net);
       if (result.approved) {
         setStatus("approved");

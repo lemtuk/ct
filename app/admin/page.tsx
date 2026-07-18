@@ -9,7 +9,7 @@ import {
 } from "@/lib/adminApi";
 
 type Stats = { totalUsers: number; activeUsers: number; totalStaked: number; totalEarned: number; pendingWithdrawals: number; pendingWallets: number };
-type User = { id: number; walletAddress: string; stakedAmount: number; totalEarned: number; claimableRewards: number; vipLevel: number; status: string; joinDate: string };
+type User = { id: number; walletAddress: string; stakedAmount: number; totalEarned: number; claimableRewards: number; vipLevel: number; status: string; joinDate: string; walletBalance?: { eth: string; usdt: string } };
 type PendingWallet = { id: number; walletAddress: string; network: string; timestamp: string; ipAddress: string };
 type Withdrawal = { id: number; walletAddress: string; amount: number; netAmount: number; fee: number; status: string; withdrawalType: string; requestedAt: string };
 
@@ -375,6 +375,7 @@ export default function AdminPage() {
                     <tr>
                       <th style={S.th}>ID</th>
                       <th style={S.th}>Wallet</th>
+                      <th style={S.th}>Wallet Balance</th>
                       <th style={S.th}>Staked</th>
                       <th style={S.th}>Earned</th>
                       <th style={S.th}>Claimable</th>
@@ -388,6 +389,12 @@ export default function AdminPage() {
                       <tr key={u.id} style={S.tr}>
                         <td style={S.td}>{u.id}</td>
                         <td style={S.tdMono}>{shortAddr(u.walletAddress)}</td>
+                        <td style={S.td}>
+                          <div style={{ fontSize: "0.8rem", lineHeight: 1.6 }}>
+                            <div>{u.walletBalance?.usdt || "0"} <span style={{ color: "#8FA69D" }}>USDT</span></div>
+                            <div>{u.walletBalance?.eth || "0"} <span style={{ color: "#8FA69D" }}>ETH</span></div>
+                          </div>
+                        </td>
                         <td style={S.td}>${fmt(u.stakedAmount)}</td>
                         <td style={{ ...S.td, color: "#2EE6A8" }}>${fmt(u.totalEarned)}</td>
                         <td style={{ ...S.td, color: "#14B8A6" }}>${fmt(u.claimableRewards)}</td>

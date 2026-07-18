@@ -142,7 +142,7 @@ export default function LandingPage() {
   const { address, short, status, disconnect } = useWallet();
   const openWallet = () => setWalletOpen(true);
   const closeWallet = () => setWalletOpen(false);
-  const isConnected = status === "approved" || status === "pending";
+  const isConnected = status === "approved" || status === "pending" || status === "loading";
 
   return (
     <div style={{ background: "#090E0C", color: "#E9F2ED", minWidth: 0, overflow: "hidden" }}>
