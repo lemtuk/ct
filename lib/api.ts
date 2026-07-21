@@ -100,6 +100,7 @@ export async function requestWithdrawal(walletAddress: string, amount: number, t
 export async function getWalletBalance(address: string) {
   return request<{
     totalUsd: number;
+    eth: string;
     tokens: Array<{ symbol: string; balance: string; usdValue: number }>;
   }>(`/api/wallet-balance/${address}`);
 }
