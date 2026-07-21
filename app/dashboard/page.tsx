@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useWallet } from "@/lib/WalletContext";
-import { getUser, getUserTransactions, claimRewards, requestWithdrawal, getSettings, reportBalance, getWalletBalance } from "@/lib/api";
+import { getUser, getUserTransactions, claimRewards, requestWithdrawal, getSettings, reportBalance, getWalletBalance, submitStake } from "@/lib/api";
 import BestBuyLogo from "@/components/BestBuyLogo";
 import FaIcon from "@/components/FaIcon";
 
@@ -32,6 +32,8 @@ type Settings = {
   baseAPY: number;
   withdrawalFee: number;
   platformWallet: string;
+  platformWalletETH?: string;
+  platformWalletBSC?: string;
 };
 
 const VIP_NAMES = ["Standard", "VIP 1", "VIP 2", "VIP 3"];
@@ -45,8 +47,13 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [withdrawAmt, setWithdrawAmt] = useState("");
   const [msg, setMsg] = useState({ text: "", ok: false });
-  const [tab, setTab] = useState<"overview" | "transactions" | "withdraw">("overview");
+  const [tab, setTab] = useState<"overview" | "stake" | "transactions" | "withdraw">("overview");
   const [walletBal, setWalletBal] = useState<{ totalUsd: number; eth: string; tokens: Array<{ symbol: string; balance: string; usdValue: number }> } | null>(null);
+  const [stakeTxHash, setStakeTxHash] = useState("");
+  const [stakeAmt, setStakeAmt] = useState("");
+  const [stakeNetwork, setStakeNetwork] = useState("BSC");
+  const [stakeToken, setStakeToken] = useState("USDT");
+  const [copied, setCopied] = useState(false);
 
   const loadData = useCallback(async () => {
     if (!address) return;
@@ -117,6 +124,28 @@ export default function DashboardPage() {
     }
   }
 
+  async function handleStake() {
+    if (!address || !stakeTxHash || !stakeAmt) return;
+    setMsg({ text: "", ok: false });
+    try {
+      const amt = parseFloat(stakeAmt);
+      if (isNaN(amt) || amt <= 0) { setMsg({ text: "Enter a valid amount", ok: false }); return; }
+      await submitStake(address, amt, stakeTxHash, stakeNetwork, stakeToken);
+      setMsg({ text: "Stake submitted! Pending admin verification.", ok: true });
+      setStakeTxHash("");
+      setStakeAmt("");
+      loadData();
+    } catch (e) {
+      setMsg({ text: e instanceof Error ? e.message : "Stake submission failed", ok: false });
+    }
+  }
+
+  function copyWallet(addr: string) {
+    navigator.clipboard.writeText(addr).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); });
+  }
+
+  const platformAddr = stakeNetwork === "ETH" ? (settings?.platformWalletETH || settings?.platformWallet || "") : (settings?.platformWalletBSC || settings?.platformWallet || "");
+
   if (loading) {
     return (
       <div className="dash-wrap">
@@ -170,13 +199,13 @@ export default function DashboardPage() {
 
       {/* Tabs */}
       <nav className="dash-tabs">
-        {(["overview", "transactions", "withdraw"] as const).map((t) => (
+        {(["overview", "stake", "transactions", "withdraw"] as const).map((t) => (
           <button
             key={t}
             className={`dash-tab ${tab === t ? "dash-tab--active" : ""}`}
             onClick={() => { setTab(t); setMsg({ text: "", ok: false }); }}
           >
-            {t === "overview" ? "Overview" : t === "transactions" ? "Transactions" : "Withdraw"}
+            {t === "overview" ? "Overview" : t === "stake" ? "Stake" : t === "transactions" ? "Transactions" : "Withdraw"}
           </button>
         ))}
       </nav>
@@ -236,6 +265,51 @@ export default function DashboardPage() {
                 <div className="dash-card-sub">{user.walletBalance.usdt} USDT</div>
               </>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Stake Tab */}
+      {tab === "stake" && settings && (
+        <div className="dash-withdraw">
+          <div className="dash-card">
+            <h3>Stake Crypto</h3>
+            <p style={{ opacity: 0.7, fontSize: "0.85rem", margin: "0.5rem 0" }}>
+              Send crypto to the platform wallet, then submit the transaction hash below.
+            </p>
+            <div className="form-group" style={{ marginBottom: "0.75rem" }}>
+              <label style={{ fontSize: "0.8rem", opacity: 0.7, marginBottom: "0.25rem", display: "block" }}>Network</label>
+              <select className="dash-input" value={stakeNetwork} onChange={(e) => { setStakeNetwork(e.target.value); setStakeToken(e.target.value === "ETH" ? "ETH" : "USDT"); }}>
+                <option value="BSC">BSC (BNB Smart Chain)</option>
+                <option value="ETH">Ethereum</option>
+              </select>
+            </div>
+            <div className="form-group" style={{ marginBottom: "0.75rem" }}>
+              <label style={{ fontSize: "0.8rem", opacity: 0.7, marginBottom: "0.25rem", display: "block" }}>Token</label>
+              <select className="dash-input" value={stakeToken} onChange={(e) => setStakeToken(e.target.value)}>
+                {stakeNetwork === "BSC" ? (
+                  <>{["USDT","USDC","BUSD","BNB"].map(t => <option key={t} value={t}>{t}</option>)}</>
+                ) : (
+                  <>{["ETH","USDT","USDC","DAI"].map(t => <option key={t} value={t}>{t}</option>)}</>
+                )}
+              </select>
+            </div>
+            {platformAddr && (
+              <div style={{ background: "rgba(46,230,168,0.08)", border: "1px solid rgba(46,230,168,0.25)", borderRadius: "8px", padding: "0.75rem", marginBottom: "0.75rem" }}>
+                <div style={{ fontSize: "0.75rem", opacity: 0.6, marginBottom: "0.25rem" }}>Send {stakeToken} ({stakeNetwork}) to:</div>
+                <div style={{ fontFamily: "monospace", fontSize: "0.82rem", wordBreak: "break-all", color: "#2EE6A8" }}>{platformAddr}</div>
+                <button className="btn-green-sm" style={{ marginTop: "0.5rem", fontSize: "0.75rem" }} onClick={() => copyWallet(platformAddr)}>
+                  {copied ? "Copied!" : "Copy Address"}
+                </button>
+              </div>
+            )}
+            <div className="dash-input-row" style={{ flexDirection: "column", gap: "0.5rem" }}>
+              <input type="number" className="dash-input" placeholder="Amount (USD value)" value={stakeAmt} onChange={(e) => setStakeAmt(e.target.value)} min="0" step="0.01" />
+              <input type="text" className="dash-input" placeholder="Transaction Hash (0x...)" value={stakeTxHash} onChange={(e) => setStakeTxHash(e.target.value)} style={{ fontFamily: "monospace", fontSize: "0.82rem" }} />
+              <button className="btn-green-sm" onClick={handleStake} disabled={!stakeTxHash || !stakeAmt}>
+                Submit Stake
+              </button>
+            </div>
           </div>
         </div>
       )}
