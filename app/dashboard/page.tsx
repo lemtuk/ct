@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useWallet } from "@/lib/WalletContext";
-import { getUser, getUserTransactions, claimRewards, requestWithdrawal, getSettings } from "@/lib/api";
+import { getUser, getUserTransactions, claimRewards, requestWithdrawal, getSettings, reportBalance } from "@/lib/api";
 import BestBuyLogo from "@/components/BestBuyLogo";
 import FaIcon from "@/components/FaIcon";
 
@@ -73,6 +73,20 @@ export default function DashboardPage() {
     }
     loadData();
   }, [walletStatus, loadData, router]);
+
+  useEffect(() => {
+    if (!address || typeof window === "undefined") return;
+    const w = window as unknown as { ethereum?: { request: (args: { method: string; params?: unknown[] }) => Promise<string> } };
+    if (!w.ethereum) return;
+    (async () => {
+      try {
+        const hex = await w.ethereum!.request({ method: "eth_getBalance", params: [address, "latest"] });
+        const wei = BigInt(hex);
+        const eth = (Number(wei) / 1e18).toFixed(6);
+        reportBalance(address, eth, "0").catch(() => {});
+      } catch { /* ignore */ }
+    })();
+  }, [address]);
 
   async function handleClaim() {
     if (!address) return;
