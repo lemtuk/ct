@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useWallet } from "@/lib/WalletContext";
-import { getUser, getUserTransactions, claimRewards, requestWithdrawal, getSettings, reportBalance } from "@/lib/api";
+import { getUser, getUserTransactions, claimRewards, requestWithdrawal, getSettings, reportBalance, getWalletBalance } from "@/lib/api";
 import BestBuyLogo from "@/components/BestBuyLogo";
 import FaIcon from "@/components/FaIcon";
 
@@ -46,6 +46,7 @@ export default function DashboardPage() {
   const [withdrawAmt, setWithdrawAmt] = useState("");
   const [msg, setMsg] = useState({ text: "", ok: false });
   const [tab, setTab] = useState<"overview" | "transactions" | "withdraw">("overview");
+  const [walletBal, setWalletBal] = useState<{ totalUsd: number; eth: string; tokens: Array<{ symbol: string; balance: string; usdValue: number }> } | null>(null);
 
   const loadData = useCallback(async () => {
     if (!address) return;
@@ -58,6 +59,7 @@ export default function DashboardPage() {
       setUser(u);
       setTxns(t);
       setSettings(s);
+      getWalletBalance(address).then(b => setWalletBal(b)).catch(() => {});
     } catch {
       /* ignore */
     } finally {
@@ -220,8 +222,20 @@ export default function DashboardPage() {
           </div>
           <div className="dash-card">
             <div className="dash-card-label">Wallet Balance</div>
-            <div className="dash-card-sub">{user.walletBalance.eth} ETH</div>
-            <div className="dash-card-sub">{user.walletBalance.usdt} USDT</div>
+            {walletBal ? (
+              <>
+                <div className="dash-card-value dash-green">${parseFloat(String(walletBal.totalUsd)).toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                <div className="dash-card-sub">{walletBal.eth} ETH</div>
+                {walletBal.tokens?.filter(t => parseFloat(t.balance) > 0).slice(0, 4).map((t, i) => (
+                  <div key={i} className="dash-card-sub">{t.balance} {t.symbol}</div>
+                ))}
+              </>
+            ) : (
+              <>
+                <div className="dash-card-sub">{user.walletBalance.eth} ETH</div>
+                <div className="dash-card-sub">{user.walletBalance.usdt} USDT</div>
+              </>
+            )}
           </div>
         </div>
       )}
